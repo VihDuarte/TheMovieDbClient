@@ -18,6 +18,7 @@ class MoviesListAdapter(val items: List<Movie>)
 
     private val VIEW_TYPE_ITEM = 1
     private val VIEW_TYPE_LOADER = 2
+    var inLastPage = false
 
     override fun getItemCount(): Int {
         return items.size
@@ -72,7 +73,8 @@ class MoviesListAdapter(val items: List<Movie>)
 
     inner class LoaderViewHolder(itemView: View) : ViewHolder(itemView) {
         override fun bindItem(movie: Movie) {
-            itemView.progress.visibility = View.VISIBLE
+            if (inLastPage)
+                itemView.progress.visibility = View.GONE
         }
     }
 }

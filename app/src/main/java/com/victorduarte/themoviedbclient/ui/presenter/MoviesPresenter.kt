@@ -7,6 +7,7 @@ import com.victor.githubclient.loader.Callback
 import com.victorduarte.themoviedbclient.data.getMovies
 import com.victorduarte.themoviedbclient.data.loader.TheMoviesDbLoaderManager
 import com.victorduarte.themoviedbclient.data.model.MovieResult
+import com.victorduarte.themoviedbclient.data.searchMovies
 import com.victorduarte.themoviedbclient.ui.view.MoviesView
 
 /**
@@ -14,35 +15,58 @@ import com.victorduarte.themoviedbclient.ui.view.MoviesView
  */
 class MoviesPresenter(var context: Context, var view: MoviesView) {
     private var currentPage = 0
+    private var currentFilter: String? = null
 
     fun getMovies(loaderManager: LoaderManager) {
+        getMovies(loaderManager, currentFilter)
+    }
+
+    fun getMovies(loaderManager: LoaderManager, filter: String?) {
         if (view == null || context == null)
             throw Exception("attach view to use the presenter")
 
+        if (currentFilter != filter) {
+            currentPage = 0
+            view.cleanData()
+            view.showProgress()
+        }
 
-        val loader = MoviesPresenterLoader(context!!, currentPage + 1)
-        TheMoviesDbLoaderManager.init(loaderManager, currentPage + 1, loader, (object : Callback<MovieResult?> {
+        currentFilter = filter
+
+        val loader = MoviesPresenterLoader(context!!, currentFilter, currentPage + 1)
+        val loaderId = if (currentFilter != null) currentFilter!!.hashCode() else 0 + currentPage + 1
+        TheMoviesDbLoaderManager.init(loaderManager, loaderId, loader, (object : Callback<MovieResult?> {
             override fun onFailure(ex: Exception) {
                 view?.showError()
+                view?.hideProgress()
             }
 
             override fun onSuccess(result: MovieResult?) {
                 if (result != null) {
                     currentPage = result.page
 
+                    if (result.totalPages == result.page)
+                        view?.onLastPage()
+
                     view?.showItems(result.results)
                     view?.hideError()
+                    view?.hideProgress()
                 } else {
                     view?.showError()
+                    view?.hideProgress()
                 }
             }
         }))
     }
 
     class MoviesPresenterLoader(context: Context,
+                                private val filter: String?,
                                 private val page: Int) : BaseLoader<MovieResult>(context) {
         override fun call(): MovieResult {
-            return getMovies(page = page)
+            if (filter != null && !filter.isEmpty())
+                return searchMovies(filter, page)
+            else
+                return getMovies(page = page)
         }
     }
 }

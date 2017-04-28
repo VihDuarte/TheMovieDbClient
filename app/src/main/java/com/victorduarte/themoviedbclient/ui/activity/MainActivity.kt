@@ -3,8 +3,11 @@ package com.victorduarte.themoviedbclient.ui.activity
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.view.MenuItemCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SearchView
+import android.view.Menu
 import android.view.View
 
 import com.victorduarte.themoviedbclient.R
@@ -14,15 +17,20 @@ import com.victorduarte.themoviedbclient.ui.presenter.MoviesPresenter
 import com.victorduarte.themoviedbclient.ui.view.MoviesView
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), MoviesView {
+class MainActivity : AppCompatActivity(), MoviesView, SearchView.OnQueryTextListener {
     private var itemList: MutableList<Movie>? = null
+
     private var movieListAdapter: MoviesListAdapter? = null
+
     private var presenter: MoviesPresenter? = null
     private var snackbar: Snackbar? = null
+    private var inLastPage = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        setSupportActionBar(activity_main_toolbar)
 
         presenter = MoviesPresenter(this, this)
 
@@ -46,7 +54,7 @@ class MainActivity : AppCompatActivity(), MoviesView {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (layoutManager
-                        .findLastCompletelyVisibleItemPosition() == layoutManager.itemCount - 1) {
+                        .findLastCompletelyVisibleItemPosition() == layoutManager.itemCount - 1 && !inLastPage) {
                     presenter?.getMovies(supportLoaderManager)
                 }
             }
@@ -54,8 +62,6 @@ class MainActivity : AppCompatActivity(), MoviesView {
     }
 
     override fun showItems(items: MutableList<Movie>) {
-        activity_main_progress.visibility = View.GONE
-
         if (movieListAdapter == null) {
             itemList = items
             movieListAdapter = MoviesListAdapter(items)
@@ -64,6 +70,14 @@ class MainActivity : AppCompatActivity(), MoviesView {
             itemList?.addAll(items)
             movieListAdapter!!.notifyDataSetChanged()
         }
+    }
+
+    override fun showProgress() {
+        activity_main_progress.visibility = View.VISIBLE
+    }
+
+    override fun hideProgress() {
+        activity_main_progress.visibility = View.GONE
     }
 
     override fun showError() {
@@ -84,5 +98,30 @@ class MainActivity : AppCompatActivity(), MoviesView {
 
     override fun cleanData() {
         itemList?.clear()
+        onLastPage()
+    }
+
+    override fun onLastPage() {
+        inLastPage = true
+        movieListAdapter?.inLastPage = true
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
+        searchView.setOnQueryTextListener(this)
+
+        return true
+    }
+
+    override fun onQueryTextChange(query: String): Boolean {
+        presenter?.getMovies(supportLoaderManager, query)
+        return true
+    }
+
+    override fun onQueryTextSubmit(query: String): Boolean {
+        return false
     }
 }

@@ -1,4 +1,4 @@
-package com.victorduarte.themoviedbclient.loader;
+package com.victorduarte.themoviedbclient.data.loader;
 
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;

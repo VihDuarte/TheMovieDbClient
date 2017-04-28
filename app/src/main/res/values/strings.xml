@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TheMovieDbClient</string>
+    <string name="movie_list_error">Não foi possivel atulizar lista</string>
+    <string name="retry">tentar novamente</string>
 </resources>

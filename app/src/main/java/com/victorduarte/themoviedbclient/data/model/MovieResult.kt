@@ -1,4 +1,4 @@
-package com.victorduarte.themoviedbclient.model
+package com.victorduarte.themoviedbclient.data.model
 
 import org.json.JSONObject
 
@@ -6,13 +6,13 @@ import org.json.JSONObject
  * Created by victor on 28/04/17.
  */
 data class MovieResult(var page: Int,
-                       var results: MutableList<Result>,
+                       var results: MutableList<Movie>,
                        var totalResults: Int,
                        var totalPages: Int)
 
 fun getMovieResulByJson(json: JSONObject): MovieResult {
     var page = 0
-    val results: MutableList<Result> = arrayListOf()
+    val results: MutableList<Movie> = arrayListOf()
     var totalResults = 0
     var totalPages = 0
 

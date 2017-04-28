@@ -4,16 +4,15 @@ import android.content.Context
 import android.support.v4.app.LoaderManager
 import com.victor.githubclient.loader.BaseLoader
 import com.victor.githubclient.loader.Callback
-import com.victorduarte.themoviedbclient.data.getMovies
+import com.victorduarte.themoviedbclient.data.Service
 import com.victorduarte.themoviedbclient.data.loader.TheMoviesDbLoaderManager
 import com.victorduarte.themoviedbclient.data.model.MovieResult
-import com.victorduarte.themoviedbclient.data.searchMovies
 import com.victorduarte.themoviedbclient.ui.view.MoviesView
 
 /**
  * Created by victor on 28/04/17.
  */
-class MoviesPresenter(var context: Context, var view: MoviesView) {
+class MoviesPresenter(var context: Context, var service: Service, var view: MoviesView) {
     private var currentPage = 0
     private var currentFilter: String? = null
 
@@ -33,7 +32,7 @@ class MoviesPresenter(var context: Context, var view: MoviesView) {
 
         currentFilter = filter
 
-        val loader = MoviesPresenterLoader(context!!, currentFilter, currentPage + 1)
+        val loader = MoviesPresenterLoader(context, service, currentFilter, currentPage + 1)
         val loaderId = if (currentFilter != null) currentFilter!!.hashCode() else 0 + currentPage + 1
         TheMoviesDbLoaderManager.init(loaderManager, loaderId, loader, (object : Callback<MovieResult?> {
             override fun onFailure(ex: Exception) {
@@ -60,13 +59,14 @@ class MoviesPresenter(var context: Context, var view: MoviesView) {
     }
 
     class MoviesPresenterLoader(context: Context,
+                                private val service: Service,
                                 private val filter: String?,
                                 private val page: Int) : BaseLoader<MovieResult>(context) {
         override fun call(): MovieResult {
             if (filter != null && !filter.isEmpty())
-                return searchMovies(filter, page)
+                return service.searchMovies(filter, page)
             else
-                return getMovies(page = page)
+                return service.getMovies(page = page)
         }
     }
 }

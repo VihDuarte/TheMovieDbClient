@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.View
 
 import com.victorduarte.themoviedbclient.R
+import com.victorduarte.themoviedbclient.data.ServiceApi
 import com.victorduarte.themoviedbclient.data.model.Movie
 import com.victorduarte.themoviedbclient.ui.adapter.MoviesListAdapter
 import com.victorduarte.themoviedbclient.ui.presenter.MoviesPresenter
@@ -32,7 +33,7 @@ class MainActivity : AppCompatActivity(), MoviesView, SearchView.OnQueryTextList
 
         setSupportActionBar(activity_main_toolbar)
 
-        presenter = MoviesPresenter(this, this)
+        presenter = MoviesPresenter(this, ServiceApi(), this)
 
         initRecyclerView()
 
@@ -98,7 +99,8 @@ class MainActivity : AppCompatActivity(), MoviesView, SearchView.OnQueryTextList
 
     override fun cleanData() {
         itemList?.clear()
-        onLastPage()
+        inLastPage = false
+        movieListAdapter?.inLastPage = false
     }
 
     override fun onLastPage() {

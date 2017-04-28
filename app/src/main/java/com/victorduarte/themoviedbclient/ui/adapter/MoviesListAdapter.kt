@@ -75,6 +75,8 @@ class MoviesListAdapter(val items: List<Movie>)
         override fun bindItem(movie: Movie) {
             if (inLastPage)
                 itemView.progress.visibility = View.GONE
+            else
+                itemView.progress.visibility = View.VISIBLE
         }
     }
 }

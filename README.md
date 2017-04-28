@@ -5,17 +5,19 @@ O objetivo desse exercicio era escrever um aplicativo que apresentassem os filme
 
 Foi escolhido o [MVP](https://antonioleiva.com/mvp-android/) como padrão de separação da camada de apresentação, pois facilita a leitura, manutenção e a escrita de testes unitários.
 
-O projeto possui a seguinte separação de pacotes:
+O projeto possui a seguinte estrutura de pacotes:
 
-|-- data                            //models e comunicações externas
-|    |-- loader                     //Loaders e callbacks das requisiçoes
-|    |-- model                      //classes de modelos
-|-- extension                       //kotlin extension
-|-- ui                              //parte visual
-|    |-- activity                   //todas as activities
-|    |-- adapter                    //todos os adapters
-|    |-- presenter                  //todos os presenters
-|    |-- view                       //protocólos entre os presenters e as views
+```
+|-- data                            
+|    |-- loader                     
+|    |-- model                      
+|-- extension                       
+|-- ui                              
+|    |-- activity                   
+|    |-- adapter                    
+|    |-- presenter                  
+|    |-- view                    
+```
 
 ## Tools
 ### IDE
